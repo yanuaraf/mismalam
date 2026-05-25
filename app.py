@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Mengatur judul tab browser
-st.set_page_config(page_title="Aplikasi Pertamaku", page_icon="1")
+st.set_page_config(page_title="Aplikasi Pertamaku", page_icon=":1:")
 
 # Menampilkan judul dan teks di web
 st.title("Aplikasi Streamlit Pertamaku!")
@@ -15,7 +15,7 @@ nama = st.text_input("Siapa namamu?")
 #Tombol interaktif
 if st.button("Klik Saya!"):
     if nama:
-        st.succes(f"Halo,{nama}! Selamat belajar Streamlit, kamu hebat!")
+        st.success(f"Halo,{nama}! Selamat belajar Streamlit, kamu hebat!")
         st.balloons() #Memunculkan animasi balon
     else:
         st.warning("Isi namamu dulu di kotak atas ya!")
