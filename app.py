@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Mengatur judul tab browser
-st.set_page_config(page_title="Aplikasi Pertamaku", page_icon=":1:")
+st.set_page_config(page_title="Aplikasi Pertamaku", page_icon=":one:")
 
 # Menampilkan judul dan teks di web
 st.title("Aplikasi Streamlit Pertamaku!")
