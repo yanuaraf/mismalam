@@ -15,7 +15,7 @@ nama = st.text_input("Siapa namamu?")
 #Tombol interaktif
 if st.button("Klik Saya!"):
     if nama:
-        st.succes(f"Halo, {nama}! Selamat belajar Streamlit, kamu hebat!")
+        st.succes(f"Halo,{nama}! Selamat belajar Streamlit, kamu hebat!")
         st.balloons() #Memunculkan animasi balon
     else:
         st.warning("Isi namamu dulu di kotak atas ya!")
