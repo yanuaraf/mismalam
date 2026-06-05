@@ -1,10 +1,8 @@
 import streamlit as st
 
-# ==================================================
-# 1. CONFIG & INITIALIZATION (SESSION STATE)
-# ==================================================
 st.set_page_config(page_title="Sistem Antrian Bank", page_icon="🏦", layout="wide")
 
+# Inisialisasi data antrian
 if "antrian_prioritas" not in st.session_state:
     st.session_state.antrian_prioritas = []
 if "antrian_lansia" not in st.session_state:
@@ -12,6 +10,7 @@ if "antrian_lansia" not in st.session_state:
 if "antrian_reguler" not in st.session_state:
     st.session_state.antrian_reguler = []
 
+# Inisialisasi nomor urut
 if "nomor_prioritas" not in st.session_state:
     st.session_state.nomor_prioritas = 1
 if "nomor_lansia" not in st.session_state:
@@ -19,121 +18,99 @@ if "nomor_lansia" not in st.session_state:
 if "nomor_reguler" not in st.session_state:
     st.session_state.nomor_reguler = 1
 
-if "nasabah_dipanggil" not in st.session_state:
-    st.session_state.nasabah_dipanggil = None
+# Data nasabah yang sedang dipanggil
+if "panggilan_sekarang" not in st.session_state:
+    st.session_state.panggilan_sekarang = None
 
+# Tampilan Utama
+st.title("🏦 Sistem Antrian Bank Prioritas")
+st.write("Aplikasi manajemen antrian nasabah berbasis web.")
+st.divider()
 
-# ==================================================
-# 2. HEADER & INPUT UTAMA
-# ==================================================
-st.title("🏦 Aplikasi Antrian Bank Pertamaku!")
-st.write("Selamat! Kamu berhasil menggabungkan logika **Sistem Antrian Bank** ke dalam *interface* **Streamlit** yang interaktif dan dinamis.")
+# Membagi halaman menjadi dua kolom
+kolom_kiri, kolom_kanan = st.columns([1, 1])
 
-st.divider() # Garis pembatas dari kode kedua
-
-# Membagi halaman menjadi 2 kolom (Kiri: Operasional | Kanan: Live Monitor)
-col1, col2 = st.columns([1, 1])
-
-with col1:
-    # ----------------------------------------------
-    # FITUR: TAMBAH NASABAH
-    # ----------------------------------------------
-    st.header("➕ Registrasi Nasabah")
+with kolom_kiri:
+    st.header("Pendaftaran Nasabah")
     
-    # Input komponen interaktif
-    nama = st.text_input("Siapa nama nasabah?")
-    jenis = st.selectbox("Pilih Kategori Nasabah:", ["Prioritas", "Lansia", "Reguler"])
+    nama = st.text_input("Nama Nasabah:")
+    kategori = st.selectbox("Pilih Kategori:", ["Prioritas", "Lansia", "Reguler"])
 
-    if st.button("Ambil Nomor Antrian"):
-        if nama: # Validasi jika nama sudah diisi (Logika dari kode kedua)
-            if jenis == "Prioritas":
-                nomor = f"P{st.session_state.nomor_prioritas:03d}"
-                st.session_state.antrian_prioritas.append({"nomor": nomor, "nama": nama})
+    if st.button("Ambil Antrian"):
+        if nama:
+            if kategori == "Prioritas":
+                kode = f"P{st.session_state.nomor_prioritas:03d}"
+                st.session_state.antrian_prioritas.append({"nomor": kode, "nama": nama})
                 st.session_state.nomor_prioritas += 1
-            elif jenis == "Lansia":
-                nomor = f"L{st.session_state.nomor_lansia:03d}"
-                st.session_state.antrian_lansia.append({"nomor": nomor, "nama": nama})
+            elif kategori == "Lansia":
+                kode = f"L{st.session_state.nomor_lansia:03d}"
+                st.session_state.antrian_lansia.append({"nomor": kode, "nama": nama})
                 st.session_state.nomor_lansia += 1
-            elif jenis == "Reguler":
-                nomor = f"R{st.session_state.nomor_reguler:03d}"
-                st.session_state.antrian_reguler.append({"nomor": nomor, "nama": nama})
+            elif kategori == "Reguler":
+                kode = f"R{st.session_state.nomor_reguler:03d}"
+                st.session_state.antrian_reguler.append({"nomor": kode, "nama": nama})
                 st.session_state.nomor_reguler += 1
             
-            # Memunculkan alert sukses dan animasi balon (Dari kode kedua)
-            st.success(f"Sukses! Nomor Antrian **{nomor}** dibuat untuk **{nama}** ({jenis})")
-            st.balloons() 
-            
+            st.success(f"Nomor antrian {kode} berhasil dibuat untuk {nama}")
+            st.balloons()
         else:
-            # Memunculkan alert peringatan jika teks input kosong (Dari kode kedua)
-            st.warning("Isi nama nasabah terlebih dahulu di kotak atas!")
+            st.warning("Silakan isi nama nasabah terlebih dahulu!")
 
     st.divider()
 
-    # ----------------------------------------------
-    # FITUR: PANGGIL NASABAH (LOGIKA HIERARKI)
-    # ----------------------------------------------
-    st.header("📢 Loket Panggilan")
-    if st.button("Panggil Antrian Berikutnya", type="primary", use_container_width=True):
-        # Menyaring urutan prioritas: Prioritas -> Lansia -> Reguler
+    st.header("Panggil Antrian")
+    if st.button("Panggil Berikutnya", type="primary", use_container_width=True):
         if st.session_state.antrian_prioritas:
-            st.session_state.nasabah_dipanggil = st.session_state.antrian_prioritas.pop(0)
-            st.session_state.nasabah_dipanggil["jenis"] = "PRIORITAS"
+            st.session_state.panggilan_sekarang = st.session_state.antrian_prioritas.pop(0)
+            st.session_state.panggilan_sekarang["jenis"] = "Prioritas"
         elif st.session_state.antrian_lansia:
-            st.session_state.nasabah_dipanggil = st.session_state.antrian_lansia.pop(0)
-            st.session_state.nasabah_dipanggil["jenis"] = "LANSIA"
+            st.session_state.panggilan_sekarang = st.session_state.antrian_lansia.pop(0)
+            st.session_state.panggilan_sekarang["jenis"] = "Lansia"
         elif st.session_state.antrian_reguler:
-            st.session_state.nasabah_dipanggil = st.session_state.antrian_reguler.pop(0)
-            st.session_state.nasabah_dipanggil["jenis"] = "REGULER"
+            st.session_state.panggilan_sekarang = st.session_state.antrian_reguler.pop(0)
+            st.session_state.panggilan_sekarang["jenis"] = "Reguler"
         else:
-            st.session_state.nasabah_dipanggil = None
+            st.session_state.panggilan_sekarang = None
+            st.warning("Semua antrian sudah kosong.")
 
-    # Menampilkan papan info panggilan saat ini
-    if st.session_state.nasabah_dipanggil:
-        nsb = st.session_state.nasabah_dipanggil
-        st.info(f"### Menuju Loket: **{nsb['nomor']}** - {nsb['nama']} [{nsb['jenis']}]")
-    else:
-        st.caption("Belum ada panggilan aktif atau antrian kosong.")
+    # Menampilkan data yang dipanggil
+    if st.session_state.panggilan_sekarang:
+        nsb = st.session_state.panggilan_sekarang
+        st.info(f"### Nomor: {nsb['nomor']} \n### Nama: {nsb['nama']} \nKategori: {nsb['jenis']}")
 
-
-with col2:
-    # ==================================================
-    # 3. LIVE MONITOR & STATISTIK
-    # ==================================================
-    st.header("📊 Monitor Antrian")
+with kolom_kanan:
+    st.header("Status Antrian")
     
-    # Membaca panjang list antrian saat ini
-    len_p = len(st.session_state.antrian_prioritas)
-    len_l = len(st.session_state.antrian_lansia)
-    len_r = len(st.session_state.antrian_reguler)
-    total_sisa = len_p + len_l + len_r
+    total_prioritas = len(st.session_state.antrian_prioritas)
+    total_lansia = len(st.session_state.antrian_lansia)
+    total_reguler = len(st.session_state.antrian_reguler)
+    total_semua = total_prioritas + total_lansia + total_reguler
 
-    # Menampilkan visual data statistik ringkas
-    st.subheader(f"Total Sisa Antrian: {total_sisa} Orang")
+    st.write(f"**Total sisa antrian:** {total_semua} orang")
     
-    # Menampilkan list isi antrian menggunakan komponen Expander
-    with st.expander(f"🔴 Antrian Prioritas ({len_p})", expanded=True):
-        if len_p == 0: st.text("Kosong")
-        for data in st.session_state.antrian_prioritas:
-            st.text(f"• {data['nomor']} - {data['nama']}")
+    with st.expander(f"Antrian Prioritas ({total_prioritas})", expanded=True):
+        if total_prioritas == 0:
+            st.text("Kosong")
+        for orang in st.session_state.antrian_prioritas:
+            st.text(f"- {orang['nomor']} : {orang['nama']}")
 
-    with st.expander(f"🟡 Antrian Lansia ({len_l})", expanded=True):
-        if len_l == 0: st.text("Kosong")
-        for data in st.session_state.antrian_lansia:
-            st.text(f"• {data['nomor']} - {data['nama']}")
+    with st.expander(f"Antrian Lansia ({total_lansia})", expanded=True):
+        if total_lansia == 0:
+            st.text("Kosong")
+        for orang in st.session_state.antrian_lansia:
+            st.text(f"- {orang['nomor']} : {orang['nama']}")
 
-    with st.expander(f"🟢 Antrian Reguler ({len_r})", expanded=True):
-        if len_r == 0: st.text("Kosong")
-        for data in st.session_state.antrian_reguler:
-            st.text(f"• {data['nomor']} - {data['nama']}")
+    with st.expander(f"Antrian Reguler ({total_reguler})", expanded=True):
+        if total_reguler == 0:
+            st.text("Kosong")
+        for orang in st.session_state.antrian_reguler:
+            st.text(f"- {orang['nomor']} : {orang['nama']}")
 
     st.divider()
     
-    # ----------------------------------------------
-    # FITUR: RESET ALL
-    # ----------------------------------------------
-    if st.button("Hapus Semua Antrian", use_container_width=True):
+    if st.button("Reset Semua Antrian", use_container_width=True):
         st.session_state.antrian_prioritas.clear()
         st.session_state.antrian_lansia.clear()
         st.session_state.antrian_reguler.clear()
-        st.session_state.nasabah_dipanggil = None
-        st.rerun() # Memaksa halaman refresh seketika
+        st.session_state.panggilan_sekarang = None
+        st.rerun()
